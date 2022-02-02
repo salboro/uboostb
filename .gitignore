@@ -1,0 +1,7 @@
+build
+target
+.gradle
+local.properties
+*.lock
+*.code-workspace
+.idea
