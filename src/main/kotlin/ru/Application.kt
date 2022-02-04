@@ -11,4 +11,6 @@ fun Application.module() {
     install(ContentNegotiation) {
         json()
     }
+
+    routes()
 }
