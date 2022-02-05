@@ -6,6 +6,7 @@ import io.ktor.gson.*
 import io.ktor.server.netty.*
 import org.koin.ktor.ext.Koin
 import org.koin.logger.SLF4JLogger
+import ru.di.module.healthCheckModule
 
 fun main(args: Array<String>): Unit = EngineMain.main(args)
 
@@ -17,7 +18,7 @@ fun Application.module() {
 
     install(Koin) {
         SLF4JLogger()
-        modules()
+        modules(healthCheckModule)
     }
 
     routes()
