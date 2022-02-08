@@ -1,15 +1,24 @@
 package ru
 
-import io.ktor.serialization.kotlinx.json.*
-import io.ktor.server.application.*
+import io.ktor.application.*
+import io.ktor.features.*
+import io.ktor.gson.*
 import io.ktor.server.netty.*
-import io.ktor.server.plugins.*
+import org.koin.ktor.ext.Koin
+import org.koin.logger.SLF4JLogger
+import ru.di.module.healthCheckModule
 
 fun main(args: Array<String>): Unit = EngineMain.main(args)
 
+@Suppress("unused")
 fun Application.module() {
     install(ContentNegotiation) {
-        json()
+        gson()
+    }
+
+    install(Koin) {
+        SLF4JLogger()
+        modules(healthCheckModule)
     }
 
     routes()
