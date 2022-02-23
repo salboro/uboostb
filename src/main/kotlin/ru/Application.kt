@@ -14,6 +14,10 @@ import org.koin.ktor.ext.Koin
 import org.koin.logger.SLF4JLogger
 import ru.di.module.authenticationModule
 import ru.di.module.healthCheckModule
+import ru.util.jwt.JWT_AUDIENCE
+import ru.util.jwt.JWT_ISSUER
+import ru.util.jwt.JWT_REALM
+import ru.util.jwt.JWT_SECRET
 
 fun main(args: Array<String>): Unit = EngineMain.main(args)
 
@@ -32,17 +36,13 @@ fun Application.module() {
         modules(healthCheckModule, authenticationModule)
     }
 
-    val secret = conf.getString("jwt.secret")
-    val issuer = conf.getString("jwt.issuer")
-    val audience = conf.getString("jwt.audience")
-    val myRealm = conf.getString("jwt.realm")
     install(Authentication) {
         jwt("auth-jwt") {
-            realm = myRealm
+            realm = JWT_REALM
             verifier(
-                JWT.require(Algorithm.HMAC256(secret))
-                    .withAudience(audience)
-                    .withIssuer(issuer)
+                JWT.require(Algorithm.HMAC256(JWT_SECRET))
+                    .withAudience(JWT_AUDIENCE)
+                    .withIssuer(JWT_ISSUER)
                     .build()
             )
 
