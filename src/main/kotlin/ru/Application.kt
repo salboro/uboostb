@@ -2,7 +2,6 @@ package ru
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import com.typesafe.config.ConfigFactory
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.auth.jwt.*
@@ -14,16 +13,15 @@ import org.koin.ktor.ext.Koin
 import org.koin.logger.SLF4JLogger
 import ru.di.module.authenticationModule
 import ru.di.module.healthCheckModule
-import ru.util.jwt.JWT_AUDIENCE
-import ru.util.jwt.JWT_ISSUER
-import ru.util.jwt.JWT_REALM
-import ru.util.jwt.JWT_SECRET
+import ru.util.envConfig
+import ru.util.provideConfig
+import java.net.URI
 
 fun main(args: Array<String>): Unit = EngineMain.main(args)
 
 @Suppress("unused")
 fun Application.module() {
-    val conf = ConfigFactory.load()
+    provideConfig()
 
     install(CallLogging)
 
@@ -36,13 +34,17 @@ fun Application.module() {
         modules(healthCheckModule, authenticationModule)
     }
 
+    val secret = envConfig.property("jwt.secret").getString()
+    val issuer = envConfig.property("jwt.issuer").getString()
+    val audience = envConfig.property("jwt.audience").getString()
+    val realm = envConfig.property("jwt.realm").getString()
     install(Authentication) {
         jwt("auth-jwt") {
-            realm = JWT_REALM
+            this.realm = realm
             verifier(
-                JWT.require(Algorithm.HMAC256(JWT_SECRET))
-                    .withAudience(JWT_AUDIENCE)
-                    .withIssuer(JWT_ISSUER)
+                JWT.require(Algorithm.HMAC256(secret))
+                    .withAudience(audience)
+                    .withIssuer(issuer)
                     .build()
             )
 
@@ -56,12 +58,20 @@ fun Application.module() {
         }
     }
 
+    val databaseUri = URI(envConfig.property("database.url").getString())
+    val databaseDriver = envConfig.property("database.driver").getString()
+    val databaseUser = databaseUri.userInfo.split(":")[0]
+    val databasePassword = databaseUri.userInfo.split(":")[1]
+    val databaseUrl = buildDatabaseUrl(databaseUri)
     Database.connect(
-        url = conf.getString("database.databaseUrl"),
-        driver = conf.getString("database.databaseDriver"),
-        user = conf.getString("database.databaseUser"),
-        password = conf.getString("database.databasePassword")
+        url = databaseUrl,
+        driver = databaseDriver,
+        user = databaseUser,
+        password = databasePassword
     )
 
     routes()
 }
+
+private fun buildDatabaseUrl(databaseUri: URI): String =
+    "jdbc:postgresql://" + databaseUri.host + ':' + databaseUri.port + databaseUri.path + "?sslmode=require"
