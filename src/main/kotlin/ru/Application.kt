@@ -13,6 +13,7 @@ import org.koin.ktor.ext.Koin
 import org.koin.logger.SLF4JLogger
 import ru.di.module.authenticationModule
 import ru.di.module.healthCheckModule
+import ru.di.module.workoutPlanModule
 import ru.util.envConfig
 import ru.util.provideConfig
 import java.net.URI
@@ -31,7 +32,7 @@ fun Application.module() {
 
     install(Koin) {
         SLF4JLogger()
-        modules(healthCheckModule, authenticationModule)
+        modules(healthCheckModule, authenticationModule, workoutPlanModule)
     }
 
     val secret = envConfig.property("jwt.secret").getString()
