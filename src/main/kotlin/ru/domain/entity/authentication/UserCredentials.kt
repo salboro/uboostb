@@ -1,6 +1,6 @@
 package ru.domain.entity.authentication
 
-data class UserLogin(
+data class UserCredentials(
     val email: String,
     val password: String,
 )
