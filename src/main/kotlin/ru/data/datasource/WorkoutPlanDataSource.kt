@@ -1,6 +1,7 @@
 package ru.data.datasource
 
 import org.jetbrains.exposed.sql.JoinType
+import org.jetbrains.exposed.sql.Query
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import ru.data.dao.*
@@ -15,68 +16,23 @@ import ru.domain.entity.workoutPlan.WorkoutPlan
 
 interface WorkoutPlanDataSource {
 
-    fun getWorkoutPlanListByUserId(userId: Int): List<WorkoutPlan>
+    fun getListByUserId(userId: Int): List<WorkoutPlan>
+    fun getList(): List<WorkoutPlan>
 }
 
 class WorkoutPlanDataSourceImpl : WorkoutPlanDataSource {
 
-    override fun getWorkoutPlanListByUserId(userId: Int): List<WorkoutPlan> = transaction {
-        val query = queryWorkoutPlansByUserId(userId)
-
-        var workoutPlanModels = mutableListOf<WorkoutPlanModel>()
-        var workoutModels = mutableListOf<WorkoutInWorkoutPlanModel>()
-        var exerciseModels = mutableListOf<StrengthExerciseInWorkoutPlanModel>()
-        var setModels = mutableListOf<StrengthExerciseSetModel>()
-
-        query.forEach { row ->
-            workoutPlanModels += WorkoutPlanModel(
-                row[WorkoutPlanDao.id],
-                row[WorkoutPlanDao.name],
-                row[WorkoutPlanDao.description]
-            )
-
-
-            workoutModels += WorkoutInWorkoutPlanModel(
-                row[WorkoutInWorkoutPlanDao.id],
-                row[WorkoutPlanDao.id],
-                row[WorkoutInWorkoutPlanDao.name],
-                row[WorkoutInWorkoutPlanDao.description],
-                row[WorkoutInWorkoutPlanDao.imageUri],
-            )
-
-            exerciseModels += StrengthExerciseInWorkoutPlanModel(
-                row[WorkoutPlanStrengthExerciseDao.exerciseId],
-                row[WorkoutInWorkoutPlanDao.id],
-                row[ExerciseDao.name],
-                row[ExerciseDao.description],
-                row[ExerciseDao.iconUri],
-            )
-
-            setModels += StrengthExerciseSetModel(
-                row[WorkoutInWorkoutPlanDao.id],
-                row[WorkoutPlanStrengthExerciseDao.exerciseId],
-                row[WorkoutPlanStrengthExerciseDao.setNumber],
-                row[WorkoutPlanStrengthExerciseDao.weight],
-                row[WorkoutPlanStrengthExerciseDao.repetitionsNumber]
-            )
-        }
-
-        workoutPlanModels = workoutPlanModels.distinct().toMutableList()
-        workoutModels = workoutModels.distinct().toMutableList()
-        exerciseModels = exerciseModels.distinct().toMutableList()
-        setModels = setModels.distinct().toMutableList()
-
-        workoutPlanModels.map { workoutPlanModel ->
-            WorkoutPlan(
-                workoutPlanModel.id,
-                workoutPlanModel.name,
-                workoutPlanModel.description,
-                getWorkoutByWorkoutPlanModel(workoutPlanModel, workoutModels, exerciseModels, setModels)
-            )
-        }
+    override fun getListByUserId(userId: Int): List<WorkoutPlan> = transaction {
+        val query = getQueryWorkoutPlansByUserId(userId)
+        getWorkoutPlansFromQuery(query)
     }
 
-    private fun queryWorkoutPlansByUserId(userId: Int) =
+    override fun getList(): List<WorkoutPlan> = transaction {
+        val query = getQueryWorkoutPlans()
+        getWorkoutPlansFromQuery(query)
+    }
+
+    private fun getQueryWorkoutPlansByUserId(userId: Int) =
         WorkoutPlanDao
             .join(
                 UserWorkoutPlanDao,
@@ -116,6 +72,93 @@ class WorkoutPlanDataSourceImpl : WorkoutPlanDataSource {
             )
             .selectAll()
 
+    private fun getQueryWorkoutPlans() =
+        WorkoutPlanDao
+            .join(
+                WorkoutInWorkoutPlanDao,
+                JoinType.INNER,
+                additionalConstraint = { WorkoutInWorkoutPlanDao.workoutPlanId eq WorkoutPlanDao.id }
+            )
+            .join(
+                WorkoutPlanStrengthExerciseDao,
+                JoinType.INNER,
+                additionalConstraint = { WorkoutPlanStrengthExerciseDao.workoutId eq WorkoutInWorkoutPlanDao.id }
+            )
+            .join(
+                ExerciseDao,
+                JoinType.INNER,
+                additionalConstraint = { ExerciseDao.id eq WorkoutPlanStrengthExerciseDao.exerciseId }
+            )
+            .slice(
+                WorkoutPlanDao.id,
+                WorkoutPlanDao.name,
+                WorkoutPlanDao.description,
+                WorkoutInWorkoutPlanDao.id,
+                WorkoutInWorkoutPlanDao.name,
+                WorkoutInWorkoutPlanDao.description,
+                WorkoutInWorkoutPlanDao.imageUri,
+                WorkoutPlanStrengthExerciseDao.exerciseId,
+                WorkoutPlanStrengthExerciseDao.setNumber,
+                WorkoutPlanStrengthExerciseDao.weight,
+                WorkoutPlanStrengthExerciseDao.repetitionsNumber,
+                ExerciseDao.name,
+                ExerciseDao.description,
+                ExerciseDao.iconUri,
+            ).selectAll()
+
+    private fun getWorkoutPlansFromQuery(query: Query): List<WorkoutPlan> {
+
+        var workoutPlanModels = mutableListOf<WorkoutPlanModel>()
+        var workoutModels = mutableListOf<WorkoutInWorkoutPlanModel>()
+        var exerciseModels = mutableListOf<StrengthExerciseInWorkoutPlanModel>()
+        var setModels = mutableListOf<StrengthExerciseSetModel>()
+
+        query.forEach { row ->
+            workoutPlanModels += WorkoutPlanModel(
+                row[WorkoutPlanDao.id],
+                row[WorkoutPlanDao.name],
+                row[WorkoutPlanDao.description]
+            )
+
+            workoutModels += WorkoutInWorkoutPlanModel(
+                row[WorkoutInWorkoutPlanDao.id],
+                row[WorkoutPlanDao.id],
+                row[WorkoutInWorkoutPlanDao.name],
+                row[WorkoutInWorkoutPlanDao.description],
+                row[WorkoutInWorkoutPlanDao.imageUri],
+            )
+
+            exerciseModels += StrengthExerciseInWorkoutPlanModel(
+                row[WorkoutPlanStrengthExerciseDao.exerciseId],
+                row[WorkoutInWorkoutPlanDao.id],
+                row[ExerciseDao.name],
+                row[ExerciseDao.description],
+                row[ExerciseDao.iconUri],
+            )
+
+            setModels += StrengthExerciseSetModel(
+                row[WorkoutInWorkoutPlanDao.id],
+                row[WorkoutPlanStrengthExerciseDao.exerciseId],
+                row[WorkoutPlanStrengthExerciseDao.setNumber],
+                row[WorkoutPlanStrengthExerciseDao.weight],
+                row[WorkoutPlanStrengthExerciseDao.repetitionsNumber]
+            )
+        }
+
+        workoutPlanModels = workoutPlanModels.distinct().toMutableList()
+        workoutModels = workoutModels.distinct().toMutableList()
+        exerciseModels = exerciseModels.distinct().toMutableList()
+        setModels = setModels.distinct().toMutableList()
+
+        return workoutPlanModels.map { workoutPlanModel ->
+            WorkoutPlan(
+                workoutPlanModel.id,
+                workoutPlanModel.name,
+                workoutPlanModel.description,
+                getWorkoutByWorkoutPlanModel(workoutPlanModel, workoutModels, exerciseModels, setModels)
+            )
+        }
+    }
 
     private fun getWorkoutByWorkoutPlanModel(
         workoutPlanModel: WorkoutPlanModel,

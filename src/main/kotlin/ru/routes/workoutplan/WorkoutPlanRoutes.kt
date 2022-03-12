@@ -6,5 +6,6 @@ import io.ktor.routing.*
 fun Application.registerWorkoutPlanRoutes() {
     routing {
         getUserWorkoutPlans()
+        getWorkoutPlans()
     }
 }

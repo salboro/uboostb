@@ -13,6 +13,9 @@ class WorkoutPlanRepositoryImpl(
     override fun getListByEmail(email: String): List<WorkoutPlan> {
         val userId = userDataSource.getId(email)
 
-        return workoutPlanDataSource.getWorkoutPlanListByUserId(userId)
+        return workoutPlanDataSource.getListByUserId(userId)
     }
+
+    override fun getList(): List<WorkoutPlan> =
+        workoutPlanDataSource.getList()
 }
