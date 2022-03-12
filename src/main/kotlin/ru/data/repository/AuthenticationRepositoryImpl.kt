@@ -3,7 +3,7 @@ package ru.data.repository
 import ru.data.datasource.JwtDataSource
 import ru.data.datasource.UserDataSource
 import ru.domain.entity.authentication.User
-import ru.domain.entity.authentication.UserLogin
+import ru.domain.entity.authentication.UserCredentials
 import ru.domain.repository.AuthenticationRepository
 
 class AuthenticationRepositoryImpl(
@@ -15,6 +15,9 @@ class AuthenticationRepositoryImpl(
         userDataSource.add(user)
     }
 
-    override fun login(user: UserLogin): String =
-        jwtDataSource.generateToken(user.email)
+    override fun login(user: UserCredentials): String {
+        val userId = userDataSource.getId(user)
+        return jwtDataSource.generateToken(user.email, userId)
+    }
+
 }
