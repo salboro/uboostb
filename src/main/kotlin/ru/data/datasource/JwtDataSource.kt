@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit
 
 interface JwtDataSource {
 
-    fun generateToken(userEmail: String): String
+    fun generateToken(userEmail: String, userId: Int): String
 }
 
 class JwtDataSourceImpl : JwtDataSource {
@@ -18,19 +18,21 @@ class JwtDataSourceImpl : JwtDataSource {
 
         const val EXPIRED_HOURS = 12L
         const val EMAIL = "email"
+        const val ID = "id"
     }
 
-    override fun generateToken(userEmail: String): String {
-        val expiresTime = Date(System.currentTimeMillis() + TimeUnit.HOURS.toMillis(EXPIRED_HOURS))
-        val secret = envConfig.property("jwt.secret").getString()
-        val issuer = envConfig.property("jwt.issuer").getString()
-        val audience = envConfig.property("jwt.audience").getString()
+    private val expiresTime = Date(System.currentTimeMillis() + TimeUnit.HOURS.toMillis(EXPIRED_HOURS))
+    private val secret = envConfig.property("jwt.secret").getString()
+    private val issuer = envConfig.property("jwt.issuer").getString()
+    private val audience = envConfig.property("jwt.audience").getString()
+    private val algorithm = Algorithm.HMAC256(secret)
 
-        return JWT.create()
+    override fun generateToken(userEmail: String, userId: Int): String =
+        JWT.create()
             .withAudience(audience)
             .withIssuer(issuer)
             .withClaim(EMAIL, userEmail)
+            .withClaim(ID, userId.toString())
             .withExpiresAt(expiresTime)
-            .sign(Algorithm.HMAC256(secret))
-    }
+            .sign(algorithm)
 }

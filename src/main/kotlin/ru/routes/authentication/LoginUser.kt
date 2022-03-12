@@ -7,7 +7,7 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import org.koin.ktor.ext.inject
 import org.postgresql.util.PSQLException
-import ru.domain.entity.authentication.UserLogin
+import ru.domain.entity.authentication.UserCredentials
 import ru.domain.repository.AuthenticationRepository
 import ru.util.error.DATABASE_UNAVAILABLE_MESSAGE
 import ru.util.error.INTERNAL_SERVER_ERROR_MESSAGE
@@ -21,8 +21,8 @@ fun Route.loginUser() {
     route("/login") {
         post {
             try {
-                val userLogin = call.receive<UserLogin>()
-                val token = authenticationRepository.login(userLogin)
+                val userCredentials = call.receive<UserCredentials>()
+                val token = authenticationRepository.login(userCredentials)
 
                 call.respond(hashMapOf(TOKEN_KEY to token))
             } catch (e: NoSuchElementException) {

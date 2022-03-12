@@ -24,11 +24,11 @@ fun Route.registerUser() {
                 authenticationRepository.register(user)
                 call.respondText(SUCCESS_REGISTRATION_MESSAGE, status = HttpStatusCode.Created)
             } catch (e: PSQLException) {
-                call.respondText(DATABASE_UNAVAILABLE_MESSAGE, status = HttpStatusCode.InternalServerError)
+                call.respondText(DATABASE_UNAVAILABLE_MESSAGE + e.message, status = HttpStatusCode.InternalServerError)
             } catch (e: IllegalArgumentException) {
-                call.respondText(ILLEGAL_ARGUMENT_MESSAGE, status = HttpStatusCode.BadRequest)
+                call.respondText(ILLEGAL_ARGUMENT_MESSAGE + e.message, status = HttpStatusCode.BadRequest)
             } catch (e: Throwable) {
-                call.respondText(INTERNAL_SERVER_ERROR_MESSAGE, status = HttpStatusCode.InternalServerError)
+                call.respondText(INTERNAL_SERVER_ERROR_MESSAGE + e.message, status = HttpStatusCode.InternalServerError)
             }
         }
     }

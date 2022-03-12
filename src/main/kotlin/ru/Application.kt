@@ -50,7 +50,9 @@ fun Application.module() {
             )
 
             validate { credential ->
-                if (credential.payload.getClaim("email").asString() != "") {
+                val email = credential.payload.getClaim("email").asString()
+                val id = credential.payload.getClaim("id").asString()
+                if (email.isNotBlank() && id.isNotBlank()) {
                     JWTPrincipal(credential.payload)
                 } else {
                     null
