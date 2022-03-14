@@ -12,12 +12,12 @@ class AuthenticationRepositoryImpl(
 ) : AuthenticationRepository {
 
     override fun register(user: User) {
-        userDataSource.add(user.name, user.password, user.email)
+        userDataSource.add(user)
     }
 
-    override fun login(user: UserCredentials): String {
-        val userId = userDataSource.getId(user.email, user.password)
-        return jwtDataSource.generateToken(user.email, userId)
+    override fun login(userCredentials: UserCredentials): String {
+        val userId = userDataSource.getId(userCredentials)
+        return jwtDataSource.generateToken(userCredentials.email, userId)
     }
 
 }

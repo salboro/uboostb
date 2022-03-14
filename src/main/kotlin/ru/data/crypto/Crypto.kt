@@ -3,13 +3,13 @@ package ru.data.crypto
 import at.favre.lib.crypto.bcrypt.BCrypt
 import ru.util.envConfig
 
-interface BCryptoUtil {
+interface Crypto {
 
     fun hash(password: String): String
     fun verify(password: String, hash: String): Boolean
 }
 
-class BCryptoUtilImpl : BCryptoUtil {
+class BCryptoImpl : Crypto {
 
     private companion object {
         const val BCRYPT_COST = 6
