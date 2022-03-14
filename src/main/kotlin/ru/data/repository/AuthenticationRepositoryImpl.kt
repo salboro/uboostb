@@ -8,16 +8,16 @@ import ru.domain.repository.AuthenticationRepository
 
 class AuthenticationRepositoryImpl(
     private val userDataSource: UserDataSource,
-    private val jwtDataSource: JwtDataSource
+    private val jwtDataSource: JwtDataSource,
 ) : AuthenticationRepository {
 
     override fun register(user: User) {
         userDataSource.add(user)
     }
 
-    override fun login(user: UserCredentials): String {
-        val userId = userDataSource.getId(user)
-        return jwtDataSource.generateToken(user.email, userId)
+    override fun login(userCredentials: UserCredentials): String {
+        val userId = userDataSource.getId(userCredentials)
+        return jwtDataSource.generateToken(userCredentials.email, userId)
     }
 
 }

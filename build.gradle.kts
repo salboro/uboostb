@@ -4,6 +4,7 @@ val logback_version: String by project
 val koin_version: String by project
 val exposed_version: String by project
 val postgres_version: String by project
+val bcrypt_version: String by project
 
 plugins {
     application
@@ -52,6 +53,9 @@ dependencies {
     //Auth
     implementation("io.ktor:ktor-auth:$ktor_version")
     implementation("io.ktor:ktor-auth-jwt:$ktor_version")
+
+    //BCrypt
+    implementation("at.favre.lib:bcrypt:$bcrypt_version")
 }
 
 tasks.create("stage") {

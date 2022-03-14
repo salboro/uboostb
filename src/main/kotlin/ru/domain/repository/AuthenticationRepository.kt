@@ -7,5 +7,5 @@ interface AuthenticationRepository {
 
     fun register(user: User)
 
-    fun login(user: UserCredentials): String
+    fun login(userCredentials: UserCredentials): String
 }
