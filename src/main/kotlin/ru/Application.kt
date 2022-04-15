@@ -11,9 +11,7 @@ import io.ktor.server.netty.*
 import org.jetbrains.exposed.sql.Database
 import org.koin.ktor.ext.Koin
 import org.koin.logger.SLF4JLogger
-import ru.di.module.authenticationModule
-import ru.di.module.healthCheckModule
-import ru.di.module.workoutPlanModule
+import ru.di.module.*
 import ru.util.envConfig
 import ru.util.provideConfig
 import java.net.URI
@@ -32,7 +30,7 @@ fun Application.module() {
 
     install(Koin) {
         SLF4JLogger()
-        modules(healthCheckModule, authenticationModule, workoutPlanModule)
+        modules(healthCheckModule, authenticationModule, workoutPlanModule, newsModule, feedModule, exerciseModule)
     }
 
     val secret = envConfig.property("jwt.secret").getString()
