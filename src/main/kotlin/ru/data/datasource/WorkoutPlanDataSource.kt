@@ -58,6 +58,7 @@ class WorkoutPlanDataSourceImpl : WorkoutPlanDataSource {
                 WorkoutPlanDao.id,
                 WorkoutPlanDao.name,
                 WorkoutPlanDao.description,
+                WorkoutPlanDao.imageUri,
                 WorkoutInWorkoutPlanDao.id,
                 WorkoutInWorkoutPlanDao.name,
                 WorkoutInWorkoutPlanDao.description,
@@ -93,6 +94,7 @@ class WorkoutPlanDataSourceImpl : WorkoutPlanDataSource {
                 WorkoutPlanDao.id,
                 WorkoutPlanDao.name,
                 WorkoutPlanDao.description,
+                WorkoutPlanDao.imageUri,
                 WorkoutInWorkoutPlanDao.id,
                 WorkoutInWorkoutPlanDao.name,
                 WorkoutInWorkoutPlanDao.description,
@@ -117,7 +119,8 @@ class WorkoutPlanDataSourceImpl : WorkoutPlanDataSource {
             workoutPlanModels += WorkoutPlanModel(
                 row[WorkoutPlanDao.id],
                 row[WorkoutPlanDao.name],
-                row[WorkoutPlanDao.description]
+                row[WorkoutPlanDao.description],
+                row[WorkoutPlanDao.imageUri] ?: "",
             )
 
             workoutModels += WorkoutInWorkoutPlanModel(
@@ -155,6 +158,7 @@ class WorkoutPlanDataSourceImpl : WorkoutPlanDataSource {
                 workoutPlanModel.id,
                 workoutPlanModel.name,
                 workoutPlanModel.description,
+                workoutPlanModel.imageUri,
                 getWorkoutByWorkoutPlanModel(workoutPlanModel, workoutModels, exerciseModels, setModels)
             )
         }
