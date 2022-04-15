@@ -17,6 +17,7 @@ class ExerciseDataSourceImpl : ExerciseDataSource {
             Exercise(
                 row[ExerciseDao.id],
                 row[ExerciseDao.name],
+                row[ExerciseDao.description],
                 row[ExerciseDao.iconUri] ?: ""
             )
         }
