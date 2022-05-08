@@ -24,9 +24,9 @@ class UserDataSourceImpl(private val crypto: Crypto) : UserDataSource {
     override fun add(user: User): Int = transaction {
         val userHashPassword = crypto.hash(user.password)
         UserDao.insert {
-            it[name] = name
+            it[name] = user.name
             it[password] = userHashPassword
-            it[email] = email
+            it[email] = user.email
         } get UserDao.id
     }
 
