@@ -64,6 +64,6 @@ dependencies {
     implementation("io.ktor:ktor-client-logging:$ktor_version")
 }
 
-tasks {
-    create("stage").dependsOn("installDist")
+tasks.create("stage") {
+    dependsOn("installDist")
 }
