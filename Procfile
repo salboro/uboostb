@@ -1,1 +1,1 @@
-web: ./build/install/uboostb/bin/uboostb
+web: build/install/uboostb/bin/uboostb
