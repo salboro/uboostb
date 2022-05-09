@@ -2,14 +2,10 @@
 
 name: CI
 
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the develop branch
+
   push:
     branches: [ develop ]
-  pull_request:
-    branches: [ develop ]
-
 
   workflow_dispatch:
 
@@ -34,10 +30,34 @@ jobs:
         run: ./gradlew build
       - name: Run unit tests
         run: ./gradlew test
-        
-      - name: Dpl to heroku
-      - uses: tiagogouvea/github-dpl-action@master
-        with:
-          provider: 'heroku'
-          app: ${{secrets.HEROKU_APP_NAME}}
-          api-key: ${{secrets.HEROKU_API_KEY}}
+
+  heroku_deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Heroku login credentials
+        run: |
+          cat > ~/.netrc <<EOF
+            machine api.heroku.com
+              login $HEROKU_EMAIL
+              password $HEROKU_KEY
+            machine git.heroku.com
+              login $HEROKU_EMAIL
+              password $HEROKU_KEY
+          EOF
+        env:
+          HEROKU_KEY: ${{ secrets.HEROKU_KEY }}
+          HEROKU_EMAIL: ${{ secrets.HEROKU_EMAIL }}
+
+      - name: Add Heroku remote
+        run: heroku git:remote -a $HEROKU_APP_NAME
+        env:
+          HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
+
+      - name: Push to Heroku
+        run: git push -f heroku master
