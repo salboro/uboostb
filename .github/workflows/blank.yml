@@ -35,11 +35,9 @@ jobs:
       - name: Run unit tests
         run: ./gradlew test
         
-      - uses: actions/checkout@v2
-      - uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
+      - name: Dpl to heroku
+      - uses: tiagogouvea/github-dpl-action@master
         with:
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: ${{secrets.HEROKU_APP_NAME}}
-          heroku_email: ${{secrets.HEROKU_EMAIL}}
-          branch: "master"
-          dontuseforce: true
+          provider: 'heroku'
+          app: ${{secrets.HEROKU_APP_NAME}}
+          api-key: ${{secrets.HEROKU_API_KEY}}
