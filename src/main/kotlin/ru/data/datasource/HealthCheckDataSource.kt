@@ -8,7 +8,7 @@ interface HealthCheckDataSource {
 class HealthCheckDataSourceImpl : HealthCheckDataSource {
 
     private companion object {
-        const val HEALTH_CHECK_MESSAGE = "Alive..."
+        const val HEALTH_CHECK_MESSAGE = "Alive... now"
     }
 
     override fun get(): String = HEALTH_CHECK_MESSAGE
