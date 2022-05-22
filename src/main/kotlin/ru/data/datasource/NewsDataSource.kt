@@ -2,7 +2,7 @@ package ru.data.datasource
 
 import io.ktor.client.*
 import io.ktor.client.request.*
-import ru.data.entity.NewsResponse
+import ru.data.model.NewsResponse
 
 interface NewsDataSource {
 

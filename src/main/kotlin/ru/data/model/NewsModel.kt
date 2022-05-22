@@ -1,4 +1,4 @@
-package ru.data.entity
+package ru.data.model
 
 import com.google.gson.annotations.SerializedName
 import java.util.*
@@ -13,10 +13,10 @@ data class NewsModel(
     val title: String,
 
     @SerializedName("urlToImage")
-    val imageUri: String,
+    val imageUri: String?,
 
     @SerializedName("description")
-    val description: String,
+    val description: String?,
 
     @SerializedName("url")
     val sourceUrl: String,
