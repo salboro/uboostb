@@ -1,4 +1,4 @@
-package ru.data.model
+package ru.data.entity
 
 import com.google.gson.annotations.SerializedName
 import java.util.*

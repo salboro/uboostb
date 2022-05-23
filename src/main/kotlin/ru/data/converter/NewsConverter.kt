@@ -1,6 +1,6 @@
 package ru.data.converter
 
-import ru.data.model.NewsResponse
+import ru.data.entity.NewsResponse
 import ru.domain.entity.feed.News
 import java.text.SimpleDateFormat
 
